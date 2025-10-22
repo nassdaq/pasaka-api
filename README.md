@@ -1,29 +1,20 @@
 
- 📖 Pasaka Swahili Bible API
 
+# Pasaka Swahili Bible API
 
-This is a blazing-fast, Swahili Bible API built for developers who need scripture access in milliseconds. Whether you're working on a mobile app, website, or chatbot, the Pasaka API gets you Bible content faster than you can say Amen i hope so 😅😅😅.
+This is a blazing-fast Swahili Bible API built for developers who need scripture access in milliseconds. Whether you're working on a mobile app, website, or chatbot, the Pasaka API delivers Bible content quickly and efficiently.
 
+## Features
 
+* Ultra-fast RESTful API built with **Rust** and **Axum**
+* Access to **all books**, **chapters**, and **verses** from the Swahili Bible
+* Powerful **search** by keyword
+* API Key secured endpoints
+* Swagger UI documentation
 
-🌟 Features
+## Testing the API (Swagger)
 
-- 🔥 Ultra-fast RESTful API built with **Rust** and **Axum**
-- 📚 Access to **all books**, **chapters**, **verses** from the Swahili Bible
-- 🔍 Powerful **search** by keyword
-- 🔐 API Key secured endpoints
-- 🧾 Swagger UI documentation
-- 🖥️ Hosted & ready to use
-
-
-
- 🧪 Test the API (Swagger)
-
-You can explore all endpoints via Swagger:
-
-🔗 [Swagger UI Documentation](https://pasaka.4insec.com/swagger-ui)
-
-To authorize:
+You can explore all endpoints via Swagger. To authorize:
 
 1. Click the "Authorize" button
 2. Enter your API key in this format:
@@ -32,17 +23,16 @@ To authorize:
 x-api-key: your_api_key_here
 ```
 
+## Using the API via `curl`
 
-🧰 Using the API via `curl`
-
-If you prefer CLI or scripting, here's a sample:
+Example:
 
 ```bash
 curl -H "x-api-key: pasaka_api_7a782fcd-da06-455xxxxxx" \
-https://pasaka.4insec.com/books/66/1/1
+https://your-api-domain.com/books/66/1/1
 ```
 
-✅ **Response**:
+**Response**:
 
 ```json
 {
@@ -54,72 +44,52 @@ https://pasaka.4insec.com/books/66/1/1
 }
 ```
 
+## Endpoints
 
+| Method | Endpoint                             | Description                    |
+| ------ | ------------------------------------ | ------------------------------ |
+| GET    | `/books`                             | Get Entire Bible               |
+| GET    | `/books/{book_id}`                   | Get info about a specific book |
+| GET    | `/books/{book_id}/{chapter}`         | Get a chapter from a book      |
+| GET    | `/books/{book_id}/{chapter}/{verse}` | Get a specific verse           |
+| GET    | `/search?query={text}`               | Search verses by keyword       |
+| POST   | `/auth/register`                     | Register new user              |
+| POST   | `/auth/login`                        | Login & get token              |
 
- 📦 Endpoints
+## Authentication
 
-| Method | Endpoint                    | Description                    |
-|--------|-----------------------------|--------------------------------|
-| GET    | `/books`                    | Get Entire Bible           |
-| GET    | `/books/{book_id}`          | Get info about a specific book |
-| GET    | `/books/{book_id}/{chapter}`| Get a chapter from a book      |
-| GET    | `/books/{book_id}/{chapter}/{verse}` | Get a specific verse  |
-| GET    | `/search?query={text}`      | Search verses by keyword       |
-| POST   | `/auth/register`            | Register new user              |
-| POST   | `/auth/login`               | Login & get token              |
-
-
-
-🔐 Authentication
-
-All Bible data routes are protected by API Key.
-
- Add header in requests:
+All Bible data routes are protected by API Key. Add header in requests:
 
 ```http
 x-api-key: your_api_key
 ```
 
-You’ll receive your API key upon registration (or request one manually).
+You’ll receive your API key upon registration or request one manually.
 
+## Credits
 
+Full credit to contributors who provided clean, usable Swahili Bible JSON data, enabling this API to exist.
 
-🙏 Credits
+## Tech Stack
 
-We give full credit to the following amazing contributors who provided clean, usable Swahili Bible JSON data:
+* **Rust**
+* **Axum**
+* **API Key Security**
+* **Swagger + Utoipa**
+* **Tests included**
+* **Fast JSON search**
 
-- 💡 [Shemm Junior](https://github.com/shemmjunior) – For his clean JSON work on Swahili Bible structure.
-- 💡 [Kalebu Gwalugano](https://github.com/Kalebu) – For contributing and maintaining publicly available Swahili Bible content.
+## Contributing
 
-Without their groundwork, this API wouldn't be possible.
+PRs, ideas, and contributions are welcome:
 
-
-
-👨‍💻 Tech Stack
-
-- ⚙️ **Rust**
-- 🚀 **Axum**
-- 🔐 **API Key Security**
-- 📘 **Swagger + Utoipa**
-- 🧪 **Tests included**
-- 🔁 **Fast JSON search**
-
-
- 💌 Want to Contribute?
-
-We welcome PRs, ideas, and contributions!
-
-1. Fork this repo
+1. Fork the repo
 2. Clone and build with `cargo run`
-3. Add your changes
+3. Make your changes
 4. Open a pull request
 
-
-
-🪪 [Licence](./LICENCE)
+## Licence
 
 This project is open-source and available under the **Jesus License**.
 
 
-
-> Made with ❤️ to spread the Word quickly.
