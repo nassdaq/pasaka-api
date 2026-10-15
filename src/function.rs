@@ -12,6 +12,8 @@
 //! {"book":"66","chapter":"1","verse":"1"}   the same, as JSON
 //! {"query":"upendo"} · any other text       search
 //! {"full":true}                             every book with every verse
+//! {"register":{"email":"…","password":"…"}}  an account (the server's /register); {"login":{…}} signs in
+//! {"api_key":"pasaka_api_…"}                 checks a key; with a book, a chapter or a query it guards that answer
 //! ```
 //!
 //! Answers have the HTTP API's shape: `{"success":true,"data":…}` or
@@ -25,6 +27,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 use crate::models::bible::{BibleResponse, ErrorResponse};
+use crate::account;
 use crate::scripture;
 
 /// Read stdin, answer on stdout.
@@ -50,6 +53,9 @@ pub fn handle(body: &str) -> String {
 }
 
 enum Request {
+    Register(Credentials),
+    Login(Credentials),
+    KeyOk,
     Books { full: bool },
     Book(String),
     Chapter(String, String),
@@ -67,6 +73,15 @@ struct JsonBody {
     verse: Option<Value>,
     query: Option<String>,
     full: bool,
+    register: Option<Credentials>,
+    login: Option<Credentials>,
+    api_key: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct Credentials {
+    email: String,
+    password: String,
 }
 
 fn parse(body: &str) -> Result<Request, String> {
@@ -84,6 +99,18 @@ fn parse_json(body: &str) -> Result<Request, String> {
     let json: JsonBody = serde_json::from_str(body).map_err(|e| {
         format!("the body must be JSON like {{\"book\":\"1\",\"chapter\":\"1\",\"verse\":\"1\"}} or {{\"query\":\"upendo\"}}: {e}")
     })?;
+    if let Some(c) = json.register {
+        return Ok(Request::Register(c));
+    }
+    if let Some(c) = json.login {
+        return Ok(Request::Login(c));
+    }
+    // A key, when given, is checked before anything is answered.
+    let keyed = match json.api_key.as_deref() {
+        Some(key) if !account::check_key(key)? => return Err("invalid api key".to_string()),
+        Some(_) => true,
+        None => false,
+    };
     if let Some(query) = json.query {
         return Ok(Request::Search(query));
     }
@@ -94,6 +121,7 @@ fn parse_json(body: &str) -> Result<Request, String> {
         (Some(b), Some(c), Some(v)) => Ok(Request::Verse(b, c, v)),
         (Some(b), Some(c), None) => Ok(Request::Chapter(b, c)),
         (Some(b), None, None) => Ok(Request::Book(b)),
+        (None, None, None) if keyed && !json.full => Ok(Request::KeyOk),
         (None, None, None) => Ok(Request::Books { full: json.full }),
         _ => Err("a chapter needs its book, and a verse needs its book and chapter".to_string()),
     }
@@ -148,6 +176,9 @@ fn answer(request: Request) -> Result<String, String> {
             success(verse.to_verse())
         }
         Request::Search(query) => success(scripture::search(&query)),
+        Request::Register(c) => account::register(&c.email, &c.password),
+        Request::Login(c) => account::login(&c.email, &c.password),
+        Request::KeyOk => success(json!({ "valid": true })),
     }
 }
 
