@@ -1,19 +1,29 @@
 [package]
 name = "pasaka-api"
 version = "0.1.0"
-author = ["Kelvin Mwaijega <mwaijegakelvin@gmail.com>"]
+authors = ["Kelvin Mwaijega <mwaijegakelvin@gmail.com>"]
 edition = "2024"
 
+# The Bible is compiled in: build.rs turns src/data/swahili_bible.json into a
+# static index, so neither build reads a file at run time.
+[build-dependencies]
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
 
 [dependencies]
+serde = { version = "1.0.219", features = ["derive"] }
+serde_json = "1.0.140"
+
+# The HTTP server, Postgres, Swagger and API keys exist only on a real OS. On
+# wasm32-wasip1 (Barua Functions) the same crate is a stdin -> stdout function
+# (src/function.rs) and none of this is compiled.
+[target.'cfg(not(target_os = "wasi"))'.dependencies]
 argon2 = "0.5.3"
 axum = "0.8.3"
 chrono = { version = "0.4.40", features = ["serde"] }
 dotenvy = "0.15.7"
 hyper = "1.6.0"
 rand = "0.9.1"
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.140"
 sqlx = { version = "0.8.5", features = ["postgres", "macros", "runtime-tokio-rustls", "chrono"] }
 tokio = { version = "1.44.2", features = ["full"] }
 tower-http = { version = "0.6.2", features = [
@@ -26,3 +36,8 @@ tower-http = { version = "0.6.2", features = [
 utoipa = { version = "5.3.1", features = ["axum_extras"] }
 utoipa-swagger-ui = { version = "9.0.1", features = ["axum"] }
 uuid = { version = "1.16.0", features = ["serde", "v4"] }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

@@ -6,11 +6,9 @@ use axum::{
 use serde_json::Value;
 use sqlx::PgPool;
 use std::sync::Arc;
-use std::fs;
 
 use crate::models::bible::{
   BibleResponse,
-  BibleRoot,
   Book,
   Chapter,
   SearchQuery,
@@ -24,17 +22,15 @@ use serde_json::json;
 
 
 
+/// The books, preloaded once from the index build.rs compiles in; nothing is
+/// read from disk at run time.
 pub struct BibleData {
   books: Vec<Book>,
 }
 
 impl BibleData {
-  pub fn load() -> Result<Self,Box<dyn std::error::Error>> {
-    let file_path ="src/data/swahili_bible.json";
-    let data = fs::read_to_string(file_path)?;
-
-    let bible_root: BibleRoot = serde_json::from_str(&data)?;
-    Ok(Self {books: bible_root.books})
+  pub fn load() -> Self {
+    Self { books: crate::scripture::books().map(crate::scripture::BookRef::to_book).collect() }
   }
 
   fn get_books(&self) -> &Vec<Book>{
@@ -42,27 +38,6 @@ impl BibleData {
   }
   fn get_book(&self,book_id: &str) -> Option<&Book>{
     self.books.iter().find(|b| b.id == book_id)
-  }
-
-  fn search(&self,query:&str) -> Vec<SearchResult>{
-    let query = query.to_lowercase();
-    let mut results = Vec::new();
-
-    for book in &self.books {
-      for chapter in &book.chapters {
-        for verse in &chapter.verses {
-          if verse.text.to_lowercase().contains(&query){
-            results.push(SearchResult {
-              book: book.name.clone(),
-              chapter: chapter.chapter.clone(),
-              verse: verse.text.clone(),
-              text: verse.text.clone(),
-            });
-          }
-        }
-      }
-    }
-    results
   }
 }
 
@@ -139,7 +114,7 @@ async fn get_book(
       "data":book,
     })),
     None => Json(serde_json::json!({
-      "sucess":false,
+      "success":false,
       "error":format!("Book '{}' not found",book_id)
     })),
   }
@@ -251,11 +226,10 @@ async fn get_verse(
   )
 )]
 async fn search_bible(
-  State(state): State<AppState>,
+  State(_state): State<AppState>,
   Json(payload): Json<SearchQuery>,
 ) -> Json<BibleResponse<Vec<SearchResult>>> {
-  let bible_data = &state.1;
-  let results = bible_data.search(&payload.query);
+  let results = crate::scripture::search(&payload.query);
   
   Json(BibleResponse {
     success: true,

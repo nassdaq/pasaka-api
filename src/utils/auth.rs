@@ -48,7 +48,8 @@ where
  
   let pool = &state.0;
   
-  let result = sqlx::query!("SELECT id FROM users WHERE api_key = $1", api_key)
+  let result = sqlx::query("SELECT id FROM users WHERE api_key = $1")
+      .bind(&api_key)
       .fetch_optional(pool)
       .await;
 

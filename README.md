@@ -66,6 +66,46 @@ x-api-key: your_api_key
 
 You’ll receive your API key upon registration or request one manually.
 
+## Running it as a Barua Function
+
+The same repository deploys to [Barua Functions](https://fn.barua.app): paste
+`nassdaq/pasaka-api`, and it is compiled to WebAssembly (`wasm32-wasip1`) with
+the whole Bible built in. A function has no network and no filesystem, so there
+is no Postgres, no registration and no API key there: the public URL is the API,
+and a request is just the body you send it.
+
+| Body | Returns |
+| ---------------------------------------------- | ------------------------------------ |
+| *(empty)*                                      | all books, id and name               |
+| `books/1`                                      | a book with all its chapters         |
+| `books/1/1`                                    | a chapter                            |
+| `books/66/1/1`                                 | a verse                              |
+| `{"book":"66","chapter":"1","verse":"1"}`      | the same, as JSON                    |
+| `{"query":"Mungu ni upendo"}` or any other text | search                              |
+| `{"full":true}`                                | every book with every verse (5 MB)   |
+
+```bash
+curl https://fn.barua.app/pasaka-api -d books/66/1/1
+curl https://fn.barua.app/pasaka-api -d 'Mungu ni upendo'
+```
+
+Answers have the same shape as the HTTP API: `{"success":true,"data":…}` or
+`{"success":false,"error":"…"}`.
+
+To build the module yourself:
+
+```bash
+cargo build --release --target wasm32-wasip1
+# target/wasm32-wasip1/release/pasaka-api.wasm
+```
+
+## How the data is stored
+
+`build.rs` turns `src/data/swahili_bible.json` into a compile-time index (one
+string of verse text plus offset tables), so both the server and the function
+carry the Bible inside the binary and read nothing at run time. `cargo test`
+checks the lookups and the function's request handling.
+
 ## Credits
 
 Full credit to contributors who provided clean, usable Swahili Bible JSON data, enabling this API to exist.
