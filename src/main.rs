@@ -5,6 +5,7 @@
 // no filesystem (`function.rs`). Both answer from the Bible compiled in by
 // build.rs (`scripture.rs`).
 
+mod account;
 mod function;
 mod models;
 mod scripture;

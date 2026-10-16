@@ -184,6 +184,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "barua-fn"
+version = "0.1.0"
+source = "git+https://github.com/nassdaq/barua-fn-rs#82bc80f9d865a533891a934f265102027095a791"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "base64"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1183,10 +1192,12 @@ version = "0.1.0"
 dependencies = [
  "argon2",
  "axum",
+ "barua-fn",
  "chrono",
  "dotenvy",
  "hyper",
  "rand 0.9.1",
+ "rand_core 0.6.4",
  "serde",
  "serde_json",
  "sqlx",
