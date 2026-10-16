@@ -1,0 +1,12 @@
+{
+  "name": "Pasaka",
+  "description": "Biblia Takatifu, the Swahili Bible, as a function. Send a path or a JSON body; get JSON back.",
+  "operations": [
+    { "name": "The books", "description": "All 66 books, id and name.", "body": "" },
+    { "name": "A book", "description": "One book with every chapter and verse.", "body": "books/45" },
+    { "name": "A chapter", "description": "One chapter.", "body": "books/1/1" },
+    { "name": "A verse", "description": "One verse, by book, chapter and verse number.", "body": { "book": 43, "chapter": 3, "verse": 16 } },
+    { "name": "Search", "description": "Every verse containing a word or phrase.", "body": { "query": "upendo" } },
+    { "name": "The whole Bible", "description": "Every book with every verse. About 5 MB.", "body": { "full": true }, "note": "large" }
+  ]
+}
